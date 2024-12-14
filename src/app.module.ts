@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { MoviesModule } from './movies/movies.module';
-import { TvshowsModule } from './tvshows/tvshows.module';
+import { ListModule } from './list/list.module';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://mongodb:27017/stagedb'),
-    MoviesModule,
-    TvshowsModule,
+    ConfigModule.forRoot({ isGlobal: true }), // Ensure ConfigModule is global
+    MongooseModule.forRoot(process.env.MONGO_URI), // Use the environment variable
+    ListModule,
   ],
 })
 export class AppModule {}
