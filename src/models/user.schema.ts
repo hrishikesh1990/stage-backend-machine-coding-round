@@ -54,3 +54,6 @@ export class User {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+
+// Compound index for efficient query performance on myList
+UserSchema.index({ 'myList.contentId': 1, 'myList.contentType': 1 });

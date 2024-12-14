@@ -118,3 +118,11 @@ Good Luck!
 Feel free to reach out if you have any questions or need clarification on the requirements. We're looking forward to reviewing your submission and evaluating how you tackle this task!
 
 
+
+## Notes
+
+- Implemented all 3 apis at /list
+- Updated other code to make DB seeding work and few broken things
+- Added screenshots (/tests) of manual testing using Swagger UI
+- Automated tests pending
+- I'm primarily a Python backend dev. so was not able to complete everything in time as it took some time to understand existing code and run it.
