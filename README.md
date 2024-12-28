@@ -117,4 +117,73 @@ Good Luck!
 
 Feel free to reach out if you have any questions or need clarification on the requirements. We're looking forward to reviewing your submission and evaluating how you tackle this task!
 
+## My List -Feature
+
+My List
+GET /list: Lists all items added to the user's list with pagination and search.
+
+1.  Query Parameters:
+limit (optional, default: 10): Number of items to return.
+offset (optional, default: 0): Number of items to skip.
+search (optional, default: ""): Search term to filter items by title.
+2. Headers:
+Authorization: Bearer token.
+3. Response:
+[
+  {
+    "contentId": "string",
+    "contentType": "string",
+    "title": "string",
+    "description": "string",
+    ...
+  }
+]
+4. Error Responses:
+401 Unauthorized: Missing or invalid JWT token.
+404 Not Found: User not found.
+
+POST /list: Adds items to the user's list.
+
+1. Request Body:
+{
+  "contentId": "string",
+  "contentType": "string"
+}
+
+2. Headers:
+Authorization: Bearer token.
+
+3. Response: 
+{
+  "contentId": "string",
+  "contentType": "string"
+}
+
+4. Error Responses:
+401 Unauthorized: Missing or invalid JWT token.
+400 Bad Request: Item already exists in the list.
+
+
+DELETE /list: Removes an item from the user's list.
+
+1. Request Body:
+{
+  "contentId": "string"
+}
+
+2. Headers:
+Authorization: Bearer token.
+
+Response:
+{
+  "contentId": "string"
+}
+
+3. Error Responses:
+401 Unauthorized: Missing or invalid JWT token.
+404 Not Found: Item not found in the list.
+
+
+
+
 

@@ -9,9 +9,9 @@ import { Movie, MovieSchema } from 'src/models/movie.schema';
 @Module({
   imports: [
     MongooseModule.forFeature([
-       { name: User.name, schema: UserSchema },
-            { name: TVShow.name, schema: TVShowSchema },
-            { name: Movie.name, schema: MovieSchema },
+      { name: User.name, schema: UserSchema },
+      { name: TVShow.name, schema: TVShowSchema },
+      { name: Movie.name, schema: MovieSchema },
     ]),
   ],
   controllers: [ListController],

@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Delete, Body, Query, Param, UseGuards, Req } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Delete,
+  Body,
+  Query,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
 import { ListService } from '../service/list.servce';
 import { AddToListDto } from '../dto/add-to-list.dto';
 import { RemoveFromListDto } from '../dto/remove-from-list.dto';
@@ -12,9 +21,12 @@ export class ListController {
 
   @UseGuards(AuthGuard('jwt'))
   @Get()
-  async findAll(@Req() req, @Query('limit') limit: number=10,
-   @Query('offset') offset: number=0,
-    @Query('search') search: string) {
+  async findAll(
+    @Req() req,
+    @Query('limit') limit: number = 10,
+    @Query('offset') offset: number = 0,
+    @Query('search') search: string,
+  ) {
     const userId = req.user.userId;
     console.log(limit, offset, search);
     return this.listService.findAll(userId, limit, offset, search);
@@ -29,7 +41,10 @@ export class ListController {
 
   @UseGuards(AuthGuard('jwt'))
   @Delete()
-  async removeFromList(@Req() req, @Body() removeFromListDto: RemoveFromListDto) {
+  async removeFromList(
+    @Req() req,
+    @Body() removeFromListDto: RemoveFromListDto,
+  ) {
     const userId = req.user.userId;
     return this.listService.removeFromList(userId, removeFromListDto);
   }
