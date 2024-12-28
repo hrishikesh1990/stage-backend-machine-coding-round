@@ -434,6 +434,7 @@ export class SeedService implements OnModuleInit {
             actors: ['Matthew Broderick', 'Jeremy Irons', 'James Earl Jones'],
           },
         ]);
+        this.logger.log('Movies seeded successfully');
       } catch (error) {
         console.error('error seeding movies', error);
       }
