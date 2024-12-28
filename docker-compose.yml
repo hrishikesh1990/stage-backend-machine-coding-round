@@ -19,6 +19,15 @@ services:
       - '3000:3000'
     environment:
       MONGO_URL: mongodb://mongodb:27017/stagedb
+    develop:
+      watch:
+        - action: sync
+          path: ./src
+          target: /usr/src/app/src
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: package.json
 
 volumes:
   mongo-data:

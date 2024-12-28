@@ -5,6 +5,7 @@ import {
   IsDate,
   ArrayMinSize,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 export class CreateMovieDto {
   @ApiProperty()
@@ -24,9 +25,11 @@ export class CreateMovieDto {
   genres: string[];
 
   @ApiProperty({ type: Date })
+  @Type(() => Date)
   @IsNotEmpty()
   @IsDate()
   releaseDate: Date;
+  
 
   @ApiProperty()
   @IsNotEmpty()
