@@ -1,11 +1,30 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
-import 'reflect-metadata';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  const config = new DocumentBuilder()
+    .setTitle('Stage Api docs')
+    .setDescription('Have all the routes documentation for user, movies and tvshows')
+    .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'JWT',
+        description: 'Enter JWT token',
+        in: 'header',
+      },
+      'access-token', 
+    )
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
 
   app.enableCors({
     origin: '*',
@@ -13,23 +32,9 @@ async function bootstrap() {
     allowedHeaders: '*',
     credentials: true,
   });
-  const config = new DocumentBuilder()
-    .setTitle('Stage Api docs')
-    .setDescription(
-      'Have all the routes documentation for user, movies and tvshows',
-    )
-    .setVersion('1.0')
-    .addServer('http://127.0.0.1:3000', 'Default Server')
-    .build();
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
 
-  app.useGlobalPipes(
-    new ValidationPipe({
-      transform: true,
-      whitelist: true,
-    }),
-  );
+  app.useGlobalPipes(new ValidationPipe());
+  
   await app.listen(3000);
 }
 bootstrap();
