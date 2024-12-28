@@ -7,6 +7,11 @@ import { genre } from '../constants/constants';
 export class User {
   @Prop({ required: true })
   username: string;
+  @Prop({ required: true, unique: true })
+  email: string;
+  //added hashed password to avoid any data leak issue for stage ott users
+  @Prop({ required: true, select: false }) //I don't want to return the password in the response so exluded explicitly
+  password: string;
 
   @Prop({
     type: [

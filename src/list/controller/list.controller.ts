@@ -11,10 +11,11 @@ import {
 import { ListService } from '../service/list.servce';
 import { AddToListDto } from '../dto/add-to-list.dto';
 import { RemoveFromListDto } from '../dto/remove-from-list.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('List')
+@ApiBearerAuth('access-token')
 @Controller('list')
 export class ListController {
   constructor(private readonly listService: ListService) {}
@@ -23,12 +24,11 @@ export class ListController {
   @Get()
   async findAll(
     @Req() req,
-    @Query('limit') limit: number = 10,
-    @Query('offset') offset: number = 0,
+    @Query('limit') limit: number ,
+    @Query('offset') offset: number,
     @Query('search') search: string,
   ) {
     const userId = req.user.userId;
-    console.log(limit, offset, search);
     return this.listService.findAll(userId, limit, offset, search);
   }
 

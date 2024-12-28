@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { User } from '../models/user.schema';
 import { TVShow } from '../models/tvshow.schema';
 import { Movie } from '../models/movie.schema';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class SeedService implements OnModuleInit {
@@ -29,8 +30,9 @@ export class SeedService implements OnModuleInit {
       await this.movieModel.deleteMany({});
 
       // Create mock data
+      //For security reasons, I have hashed the passwords of the users that is stored at DB
       try {
-        await this.userModel.create([
+        const users = [
           {
             username: 'user1',
             email: 'user1@example.com',
@@ -85,7 +87,14 @@ export class SeedService implements OnModuleInit {
               dislikedGenres: ['Comedy'],
             },
           },
-        ]);
+        ];
+        // Hash passwords before saving
+      for (const user of users) {
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(user.password, salt);
+      }
+
+      await this.userModel.create(users);
       } catch (error) {
         console.log('error seeding user');
       }

@@ -56,14 +56,13 @@ export class ListService {
     return filteredContent.slice(offset, offset + limit);
   }
 
-  async addToList(
-    userId: string,
-    addToListDto: AddToListDto,
-  ): Promise<AddToListDto> {
+  async addToList(userId: string, addToListDto: AddToListDto): Promise<AddToListDto> {
     const user = await this.userModel.findById(userId).exec();
     if (!user) {
       throw new NotFoundException(`User with ID "${userId}" not found`);
     }
+  
+    // Check if content already exists in user's list
     const exists = user.myList.some(
       (item) =>
         item.contentId === addToListDto.contentId &&
@@ -72,6 +71,20 @@ export class ListService {
     if (exists) {
       throw new BadRequestException('Item already exists in the list');
     }
+  
+    // Validate if content exists in the database
+    let contentExists=null;
+    if (addToListDto.contentType === 'Movie') {
+      contentExists = await this.movieModel.exists({ _id: addToListDto.contentId });
+    } else if (addToListDto.contentType === 'TVShow') {
+      contentExists = await this.tvShowModel.exists({ _id: addToListDto.contentId });
+    }
+  
+    if (contentExists===null) {
+      throw new NotFoundException(`${addToListDto.contentType} with ID "${addToListDto.contentId}" not found`);
+    }
+  
+    // Add to list if all validations pass
     user.myList.push(addToListDto);
     await user.save();
     return addToListDto;
