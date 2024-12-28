@@ -15,4 +15,4 @@ import { TVShow, TVShowSchema } from '../models/tvshow.schema';
   ],
   providers: [SeedService],
 })
-export class SeedModule { }
+export class SeedModule {}
