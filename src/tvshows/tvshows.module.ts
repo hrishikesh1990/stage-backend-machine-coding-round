@@ -9,5 +9,6 @@ import { TVShow, TVShowSchema } from '../models/tvshow.schema';
   ],
   controllers: [TVShowsController],
   providers: [TVShowsService],
+  exports: [MongooseModule],
 })
 export class TvshowsModule {}
