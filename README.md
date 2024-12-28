@@ -50,6 +50,7 @@ You can use the following existing endpoints to interact with movies and TV show
 - POST /movies: Adds a new movie.
 - GET /tvshows: Lists all TV shows.
 - POST /tvshows: Adds a TV show.
+- POST /auth/login: returns the token that allow the uses to use watchlist feature.
 
 ### User needs to be loggedin to access these features:
 - GET /watchlist: Lists all items added to the user's watchlist with pagination ( offset, limit ).
