@@ -1,4 +1,5 @@
 version: '3.8'
+
 services:
   mongodb:
     image: mongo:4.4
@@ -19,6 +20,14 @@ services:
       - '3000:3000'
     environment:
       MONGO_URL: mongodb://mongodb:27017/stagedb
+      NODE_ENV: development
+      TSC_WATCHFILE: UseFsEventsWithFallbackDynamicPolling
+      NODE_OPTIONS: --max-old-space-size=2048
+    volumes:
+      - .:/app:delegated # Mount project directory
+      - app-node-modules:/app/node_modules # Use named volume for dependencies
+    command: npm run start:dev && npm run seed
 
 volumes:
   mongo-data:
+  app-node-modules:
