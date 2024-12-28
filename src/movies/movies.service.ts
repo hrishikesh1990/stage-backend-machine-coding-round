@@ -14,6 +14,9 @@ export class MoviesService {
     return this.movieModel.find().exec();
   }
 
+
+
+  
   async create(createMovieDto: CreateMovieDto): Promise<Movie> {
     const createdMovie = new this.movieModel(createMovieDto);
     return createdMovie.save();

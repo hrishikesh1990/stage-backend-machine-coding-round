@@ -1,3 +1,4 @@
+import * as bcrypt from 'bcryptjs';
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -30,7 +31,7 @@ export class SeedService implements OnModuleInit {
 
       // Create mock data
       try {
-        await this.userModel.create([
+        const users = [
           {
             username: 'user1',
             email: 'user1@example.com',
@@ -85,7 +86,13 @@ export class SeedService implements OnModuleInit {
               dislikedGenres: ['Comedy'],
             },
           },
-        ]);
+        ];
+        for (const user of users) {
+          const hashedPassword = await bcrypt.hash(user.password, 10);
+          user.password = hashedPassword
+        }
+        console.log("users", users)
+        await this.userModel.create(users);
       } catch (error) {
         console.log('error seeding user');
       }
