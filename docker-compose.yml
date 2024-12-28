@@ -1,12 +1,22 @@
 version: '3.8'
 services:
   mongodb:
-    image: mongo:4.4
+    image: mongo:5.0
     container_name: mongodb
+    user: "1000:1000" 
     ports:
       - '27017:27017'
     volumes:
-      - mongo-data:/data/db
+      - ./data/db:/data/db
+    command: mongod --setParameter maxTransactionLockRequestTimeoutMillis=5000
+    environment:
+      - MONGO_INITDB_DATABASE=stagedb
+    healthcheck:
+      test: mongosh --eval 'db.runCommand("ping").ok' --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
 
   app:
     build:
@@ -14,11 +24,9 @@ services:
       dockerfile: Dockerfile
     container_name: nestjs-app
     depends_on:
-      - mongodb
+      mongodb:
+        condition: service_healthy
     ports:
       - '3000:3000'
     environment:
       MONGO_URL: mongodb://mongodb:27017/stagedb
-
-volumes:
-  mongo-data:
