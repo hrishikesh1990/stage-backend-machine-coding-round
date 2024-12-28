@@ -184,6 +184,12 @@ Response:
 404 Not Found: Item not found in the list.
 
 
+##AUTHORIZATION API
+
+Added api to enable login through emailId and password
+Added hashing for password at database level to avoid mis-use of user credentials
+
+
 
 
 
