@@ -1,39 +1,22 @@
-# Use the official Node.js 16 image
-FROM node:16 as build
+# Development Dockerfile
+FROM node:18
 
-# Set the working directory inside the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json
+# Copy only package files to leverage Docker's cache
 COPY package*.json ./
 
-# Install NestJS dependencies
-RUN npm install
+# Clean npm cache and install dependencies
+RUN npm cache clean --force && npm install
 
 # Copy the rest of the application code
 COPY . .
 
-# Install TypeScript globally
-RUN npm install -g typescript
-
-# Build the NestJS application
+# Build the application
 RUN npm run build
 
-# Use a smaller Node.js image for the production build
-FROM node:16-alpine
-
-# Set the working directory inside the container
-WORKDIR /app
-
-# Copy the built application from the build image
-COPY --from=build /app/dist ./dist
-COPY package*.json ./
-
-# Install only production dependencies
-RUN npm install --production
-
-# Expose port 3000 for the NestJS application
+# Expose port 3000
 EXPOSE 3000
 
-# Command to run the application in production
-CMD ["node", "dist/main"]
+# Command to run the application in development mode
+CMD ["npm", "run", "start:dev"]
