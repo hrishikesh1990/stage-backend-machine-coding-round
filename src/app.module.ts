@@ -2,7 +2,6 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MoviesModule } from './movies/movies.module';
 import { TvshowsModule } from './tvshows/tvshows.module';
-import { SeedModule } from './seed/seed.module';
 import { AppLoggerMiddleware } from './middleware/logger.middleware';
 import { UserModule } from './users/user.module';
 import { User, UserSchema } from './models/user.schema';
@@ -13,7 +12,6 @@ import { User, UserSchema } from './models/user.schema';
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     MoviesModule,
     TvshowsModule,
-    SeedModule,
     UserModule,
   ],
 })
