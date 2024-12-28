@@ -18,6 +18,7 @@ interface CustomRequest extends Request {
 export class ListController {
   constructor(private readonly userService: UserService) {}
 
+  // Endpoint to get all item from the user's list
   @UseGuards(JwtAuthGuard)
   @Get()
   async listMyItems(
@@ -29,6 +30,7 @@ export class ListController {
     return this.userService.listMyItems(username, limit, offset);
   }
 
+  // Endpoint to add an item to the user's list
   @UseGuards(JwtAuthGuard)
   @Post()
   async addToList(@Req() request: CustomRequest, @Body() addToListDto: AddToListDto) {
@@ -36,6 +38,7 @@ export class ListController {
     return this.userService.addToList(username, addToListDto);
   }
 
+  // Endpoint to remove an item from the user's list
   @UseGuards(JwtAuthGuard)
   @Delete()
   async removeFromList(@Req() request: CustomRequest, @Body() removeFromListDto: RemoveFromListDto) {

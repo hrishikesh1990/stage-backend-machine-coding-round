@@ -11,9 +11,11 @@ import { UserService } from './list.service';
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    MoviesModule,
+    TvshowsModule,
     JwtModule.register({
       secret: 'my_stage_app',
-      signOptions: { expiresIn: '1h' },
+      signOptions: { expiresIn: '720h' },
     }),
     MoviesModule,
     TvshowsModule,
