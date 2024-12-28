@@ -1,0 +1,360 @@
+{
+  "info": {
+    "name": "Streaming API Tests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Valid Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains access_token\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.access_token).to.exist;",
+                  "});",
+                  "",
+                  "pm.test(\"Token is valid JWT format\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var token = jsonData.access_token;",
+                  "    pm.expect(token.split('.').length).to.equal(3);",
+                  "});",
+                  "",
+                  "pm.environment.set(\"TOKEN\", pm.response.json().access_token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"user1\",\n    \"password\": \"password1\"\n}"
+            },
+            "url": "{{BASE_URL}}/auth/login"
+          }
+        },
+        {
+          "name": "Invalid Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 401\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test(\"Error message exists\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.equal('Invalid credentials');",
+                  "    pm.expect(jsonData.error).to.equal('Unauthorized');",
+                  "    pm.expect(jsonData.statusCode).to.equal(401);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"user1\",\n    \"password\": \"wrongpassword\"\n}"
+            },
+            "url": "{{BASE_URL}}/auth/login"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Content Retrieval",
+      "item": [
+        {
+          "name": "Get Movies",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is array of movies\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "    pm.expect(jsonData.length).to.be.above(0);",
+                  "});",
+                  "",
+                  "pm.test(\"Movies have required fields\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var movie = jsonData[0];",
+                  "    pm.expect(movie).to.include.all.keys('_id', 'title', 'description', 'genres', 'releaseDate', 'director', 'actors');",
+                  "});",
+                  "",
+                  "if(pm.response.json().length > 0) {",
+                  "    pm.environment.set(\"MOVIE_ID\", pm.response.json()[0]._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{BASE_URL}}/movies"
+          }
+        },
+        {
+          "name": "Get TV Shows",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is array of TV shows\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "    pm.expect(jsonData.length).to.be.above(0);",
+                  "});",
+                  "",
+                  "pm.test(\"TV Shows have required fields\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var show = jsonData[0];",
+                  "    pm.expect(show).to.include.all.keys('_id', 'title', 'description', 'genres', 'episodes');",
+                  "    ",
+                  "    var episode = show.episodes[0];",
+                  "    var requiredEpisodeFields = ['episodeNumber', 'seasonNumber', 'releaseDate', 'director', 'actors', '_id'];",
+                  "    requiredEpisodeFields.forEach(field => {",
+                  "        pm.expect(episode).to.have.property(field);",
+                  "    });",
+                  "});",
+                  "",
+                  "if(pm.response.json().length > 0) {",
+                  "    pm.environment.set(\"TVSHOW_ID\", pm.response.json()[0]._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{BASE_URL}}/tvshows"
+          }
+        }
+      ]
+    },
+    {
+      "name": "My List Operations",
+      "item": [
+        {
+          "name": "Get List (Initial Check)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "if (response.items && response.items.length > 0) {",
+                  "    // Store items for cleanup",
+                  "    pm.environment.set('LIST_ITEMS', JSON.stringify(response.items));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": "{{BASE_URL}}/list"
+          }
+        },
+        {
+          "name": "Clean List (Delete Items)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 or 404\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"contentId\": \"{{CONTENT_ID}}\"\n}"
+            },
+            "url": "{{BASE_URL}}/list"
+          }
+        },
+        {
+          "name": "Add Movie to List",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is either 201 (new addition) or 400 (duplicate)\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([201, 400]);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has correct structure\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (pm.response.code === 201) {",
+                  "        pm.expect(jsonData.message).to.exist;",
+                  "    } else if (pm.response.code === 400) {",
+                  "        pm.expect(jsonData.message).to.equal('Content already in list');",
+                  "        pm.expect(jsonData.error).to.equal('Bad Request');",
+                  "        pm.expect(jsonData.statusCode).to.equal(400);",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"contentId\": \"{{MOVIE_ID}}\",\n    \"contentType\": \"Movie\"\n}"
+            },
+            "url": "{{BASE_URL}}/list"
+          }
+        },
+        {
+          "name": "Add TV Show to List",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is either 201 (new addition) or 400 (duplicate)\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([201, 400]);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has correct structure\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (pm.response.code === 201) {",
+                  "        pm.expect(jsonData.message).to.exist;",
+                  "    } else if (pm.response.code === 400) {",
+                  "        pm.expect(jsonData.message).to.equal('Content already in list');",
+                  "        pm.expect(jsonData.error).to.equal('Bad Request');",
+                  "        pm.expect(jsonData.statusCode).to.equal(400);",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"contentId\": \"{{TVSHOW_ID}}\",\n    \"contentType\": \"TVShow\"\n}"
+            },
+            "url": "{{BASE_URL}}/list"
+          }
+        },
+        {
+          "name": "Get List (With Items)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has correct structure\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('items');",
+                  "    pm.expect(jsonData.items).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": "{{BASE_URL}}/list"
+          }
+        }
+      ]
+    }
+  ]
+}
