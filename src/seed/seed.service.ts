@@ -13,7 +13,7 @@ export class SeedService implements OnModuleInit {
     @InjectModel(User.name) private userModel: Model<User>,
     @InjectModel(TVShow.name) private tvShowModel: Model<TVShow>,
     @InjectModel(Movie.name) private movieModel: Model<Movie>,
-  ) {}
+  ) { }
 
   async onModuleInit() {
     await this.seedDatabase();
@@ -437,6 +437,22 @@ export class SeedService implements OnModuleInit {
       } catch (error) {
         console.error('error seeding movies', error);
       }
+
+      // try {
+      //   for (let i = 0; i < 10; i++) {
+      //     const firstUser = await this.userModel.find()[0];
+      //     const randomMovie = await this.movieModel.aggregate([
+      //       { $sample: { size: 1 } },
+      //     ])[0];
+
+      //     firstUser.myList.push({
+      //       contentId: randomMovie._id,
+      //       contentType: 'Movie',
+      //     });
+      //   }
+      // } catch (error) {
+      //   console.error('error seeding list', error);
+      // }
 
       this.logger.log('Database seeded successfully');
     } catch (error) {
