@@ -26,10 +26,9 @@ export class ListController {
     @Req() req,
     @Query('limit') limit: number ,
     @Query('offset') offset: number,
-    @Query('search') search: string,
   ) {
     const userId = req.user.userId;
-    return this.listService.findAll(userId, limit, offset, search);
+    return this.listService.findAll(userId, limit, offset);
   }
 
   @UseGuards(AuthGuard('jwt'))

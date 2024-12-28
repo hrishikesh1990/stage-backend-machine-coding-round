@@ -10,6 +10,7 @@ import { AddToListDto } from '../dto/add-to-list.dto';
 import { RemoveFromListDto } from '../dto/remove-from-list.dto';
 import { Movie, MovieDocument } from 'src/models/movie.schema';
 import { TVShow, TVShowDocument } from 'src/models/tvshow.schema';
+import { off } from 'process';
 
 @Injectable()
 export class ListService {
@@ -24,14 +25,13 @@ export class ListService {
     userId: string,
     limit: number,
     offset: number,
-    search: string,
   ): Promise<any[]> {
     const user = await this.userModel.findById(userId).exec();
     if (!user) {
       throw new NotFoundException(`User with ID "${userId}" not found`);
     }
 
-    const myList = user.myList;
+    const myList = user.myList.slice(offset, offset + limit);
 
     // Fetch content details with pagination and search
     const contentDetails = await Promise.all(
@@ -46,14 +46,8 @@ export class ListService {
       }),
     );
 
-    // Filter and paginate results
-    const filteredContent = contentDetails.filter(
-      (content) =>
-        content &&
-        (!search || content.title.toLowerCase().includes(search.toLowerCase())),
-    );
 
-    return filteredContent.slice(offset, offset + limit);
+    return contentDetails
   }
 
   async addToList(userId: string, addToListDto: AddToListDto): Promise<AddToListDto> {
