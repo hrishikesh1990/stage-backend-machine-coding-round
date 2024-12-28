@@ -4,8 +4,10 @@ import {
   IsArray,
   IsDate,
   ArrayMinSize,
+  IsEnum,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { genre } from 'src/constants/constants';
 export class CreateMovieDto {
   @ApiProperty()
   @IsNotEmpty()
@@ -21,6 +23,7 @@ export class CreateMovieDto {
   @IsNotEmpty()
   @IsArray()
   @ArrayMinSize(1)
+  @IsEnum(genre, { each: true })
   genres: string[];
 
   @ApiProperty({ type: Date })

@@ -8,25 +8,24 @@ export class User {
   @Prop({ required: true })
   username: string;
 
-  @Prop({
-    type: [
-      {
-        type: String,
-        enum: genre,
-      },
-    ],
-  })
-  favoriteGenres: string[];
+  @Prop({ required: true })
+  password: string;
+
+  @Prop({ required: true })
+  email: string;
 
   @Prop({
-    type: [
-      {
-        type: String,
-        enum: genre,
-      },
-    ],
+    type: Object,
+    required: true,
+    default: {
+      favoriteGenres: [],
+      dislikedGenres: [],
+    },
   })
-  dislikedGenres: string[];
+  preferences: {
+    favoriteGenres: string[];
+    dislikedGenres: string[];
+  };
 
   @Prop([
     {
