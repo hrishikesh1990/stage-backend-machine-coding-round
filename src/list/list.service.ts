@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from '../models/user.schema';
@@ -17,7 +21,7 @@ export class UserService {
 
   // Method to add an item to the user's list
   async addToList(username: string, addToListDto: AddToListDto) {
-    const user = await this.userModel.findOne({username});
+    const user = await this.userModel.findOne({ username });
     if (!user) {
       throw new NotFoundException('User not found');
     }
@@ -35,9 +39,8 @@ export class UserService {
     return user.myList;
   }
 
- 
   async removeFromList(username: string, removeFromListDto: RemoveFromListDto) {
-    const user = await this.userModel.findOne({username});
+    const user = await this.userModel.findOne({ username });
     if (!user) {
       throw new NotFoundException('User not found');
     }
@@ -55,9 +58,9 @@ export class UserService {
     return user.myList;
   }
 
- // Method to list items from the user's list with details
+  // Method to list items from the user's list with details
   async listMyItems(username: string, limit: number, offset: number) {
-    const user = await this.userModel.findOne({username});
+    const user = await this.userModel.findOne({ username });
     if (!user) {
       throw new NotFoundException('User not found');
     }
@@ -67,15 +70,15 @@ export class UserService {
 
     // Fetch detailed information for each item based on its content type
     const detailedItems = await Promise.all(
-        items.map(async (item) => {
-          if (item.contentType === 'Movie') {
-            return this.movieModel.findById(item.contentId).exec();
-          } else if (item.contentType === 'TVShow') {
-            return this.tvShowModel.findById(item.contentId).exec();
-          }
-        }),
-      );
-    
-      return detailedItems;
+      items.map(async (item) => {
+        if (item.contentType === 'Movie') {
+          return this.movieModel.findById(item.contentId).exec();
+        } else if (item.contentType === 'TVShow') {
+          return this.tvShowModel.findById(item.contentId).exec();
+        }
+      }),
+    );
+
+    return detailedItems;
   }
 }

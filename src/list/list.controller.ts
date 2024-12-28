@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Delete, Body, Query, UseGuards, Req } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Delete,
+  Body,
+  Query,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
 import { UserService } from './list.service';
 import { AddToListDto } from './dto/add-to-list.dto';
 import { RemoveFromListDto } from './dto/remove-from-list.dto';
@@ -33,7 +42,10 @@ export class ListController {
   // Endpoint to add an item to the user's list
   @UseGuards(JwtAuthGuard)
   @Post()
-  async addToList(@Req() request: CustomRequest, @Body() addToListDto: AddToListDto) {
+  async addToList(
+    @Req() request: CustomRequest,
+    @Body() addToListDto: AddToListDto,
+  ) {
     const username = request.user['username'];
     return this.userService.addToList(username, addToListDto);
   }
@@ -41,7 +53,10 @@ export class ListController {
   // Endpoint to remove an item from the user's list
   @UseGuards(JwtAuthGuard)
   @Delete()
-  async removeFromList(@Req() request: CustomRequest, @Body() removeFromListDto: RemoveFromListDto) {
+  async removeFromList(
+    @Req() request: CustomRequest,
+    @Body() removeFromListDto: RemoveFromListDto,
+  ) {
     const username = request.user['username'];
     return this.userService.removeFromList(username, removeFromListDto);
   }

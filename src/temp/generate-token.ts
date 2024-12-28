@@ -5,4 +5,4 @@ const payload = { username: 'user2' };
 
 const token = jwt.sign(payload, secret, { expiresIn: '1h' });
 
-console.log("Generated jwt token: ", token);
+console.log('Generated jwt token: ', token);

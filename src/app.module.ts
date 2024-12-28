@@ -13,7 +13,7 @@ import { SeedModule } from './seed/seed.module';
     TvshowsModule,
     ListModule,
     AuthModule,
-    SeedModule
+    SeedModule,
   ],
 })
 export class AppModule {}
