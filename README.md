@@ -43,19 +43,6 @@ docker-compose up --build
 ### Swagger Documentation for existing apis
 Swagger Documentation: http://127.0.0.1:3000/api
 
-
-### API Endpoints to Be Developed
-The application needs to expose the following API endpoints by the completion of this assignment:
-
-- GET /list: Lists all items added to the user's list with pagination.
-- POST /list: Adds items to the user's list.
-- DELETE /list: Removes an item from the user's list.
-
-### Detailed Requirements for the API:
-- GET /list should include pagination support (e.g., limit and offset).
-- POST /list must validate incoming data and ensure no duplicate items are added.
-- DELETE /list should ensure proper validation of the item being removed and return meaningful responses.
-
 ### Existing Endpoints in the Application
 You can use the following existing endpoints to interact with movies and TV shows:
 
@@ -63,6 +50,12 @@ You can use the following existing endpoints to interact with movies and TV show
 - POST /movies: Adds a new movie.
 - GET /tvshows: Lists all TV shows.
 - POST /tvshows: Adds a TV show.
+
+### User needs to be loggedin to access these features:
+- GET /watchlist: Lists all items added to the user's watchlist with pagination ( offset, limit ).
+- POST /watchlist: Adds items to the user's watch.
+- DELETE /watchlist: Removes an item from the user's watchlist.
+
 Note: These endpoints are already implemented and should function correctly. Feel free to review and improve them where necessary.
 
 ## Evaluation Criteria
@@ -118,3 +111,8 @@ Good Luck!
 Feel free to reach out if you have any questions or need clarification on the requirements. We're looking forward to reviewing your submission and evaluating how you tackle this task!
 
 
+## Latest Changes
+
+- Here I have implemented login API with JWT token and also did nacessory changes in existing code
+- Created global exception handler for if any API gived unexpected error it can be handled and server will not crash
+- As per the given task created watchlist API with add, get and delete
