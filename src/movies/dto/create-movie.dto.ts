@@ -2,8 +2,8 @@ import {
   IsNotEmpty,
   IsString,
   IsArray,
-  IsDate,
   ArrayMinSize,
+  IsDateString,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 export class CreateMovieDto {
@@ -25,7 +25,7 @@ export class CreateMovieDto {
 
   @ApiProperty({ type: Date })
   @IsNotEmpty()
-  @IsDate()
+  @IsDateString()
   releaseDate: Date;
 
   @ApiProperty()
