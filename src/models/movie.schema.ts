@@ -6,23 +6,23 @@ export type MovieDocument = Movie & Document;
 
 @Schema()
 export class Movie {
-  @Prop({ required: true })
+
+  // Index for title searches
+  @Prop({ required: true, index: true })
   title: string;
 
   @Prop({ required: true })
   description: string;
 
+  // Index for genre filtering
   @Prop({
-    type: [
-      {
-        type: String,
-        enum: genre,
-      },
-    ],
+      type: [{ type: String, enum: genre }],
+      index: true
   })
   genres: string[];
 
-  @Prop({ required: true })
+  // Index for release date sorting
+  @Prop({ required: true, index: true })
   releaseDate: Date;
 
   @Prop({ required: true })
@@ -33,3 +33,6 @@ export class Movie {
 }
 
 export const MovieSchema = SchemaFactory.createForClass(Movie);
+
+// Create compound index for title and genres
+MovieSchema.index({ title: 1, genres: 1 });

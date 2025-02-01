@@ -5,13 +5,16 @@ export type EpisodeDocument = Episode & Document;
 
 @Schema()
 export class Episode {
-  @Prop({ required: true })
+
+  // Index for querying episodes by season and episode number
+  @Prop({ required: true, index: true })
   episodeNumber: number;
 
   @Prop({ required: true })
   seasonNumber: number;
 
-  @Prop({ required: true })
+  // Index for sorting episodes by release date
+  @Prop({ required: true, index: true })
   releaseDate: Date;
 
   @Prop({ required: true })
@@ -22,3 +25,6 @@ export class Episode {
 }
 
 export const EpisodeSchema = SchemaFactory.createForClass(Episode);
+
+// Create compound index for season and episode number
+EpisodeSchema.index({ seasonNumber: 1, episodeNumber: 1 });
