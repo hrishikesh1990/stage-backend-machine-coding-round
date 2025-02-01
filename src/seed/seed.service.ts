@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { User } from '../models/user.schema';
 import { TVShow } from '../models/tvshow.schema';
 import { Movie } from '../models/movie.schema';
+import { mockMovies, mockTvShows } from 'src/constants/mockdata';
 
 @Injectable()
 export class SeedService implements OnModuleInit {
@@ -13,7 +14,7 @@ export class SeedService implements OnModuleInit {
     @InjectModel(User.name) private userModel: Model<User>,
     @InjectModel(TVShow.name) private tvShowModel: Model<TVShow>,
     @InjectModel(Movie.name) private movieModel: Model<Movie>,
-  ) {}
+  ) { }
 
   async onModuleInit() {
     await this.seedDatabase();
@@ -333,12 +334,26 @@ export class SeedService implements OnModuleInit {
             ],
           },
         ]);
+        await this.tvShowModel.create(mockTvShows);
       } catch (error) {
         console.error('Error in seeding tv shows');
       }
 
       try {
         await this.movieModel.create([
+          {
+            title: 'Interstellar',
+            description:
+              'A team of explorers travel through a wormhole in space in an attempt to ensure humanitys survival.',
+            genres: ['Adventure', 'Drama', 'SciFi'],
+            releaseDate: '2014-11-07T00:00:00Z',
+            director: 'Christopher Nolan',
+            actors: [
+              'Matthew McConaughey',
+              'Anne Hathaway',
+              'Jessica Chastain',
+            ],
+          },
           {
             title: 'Inception',
             description:
@@ -434,6 +449,7 @@ export class SeedService implements OnModuleInit {
             actors: ['Matthew Broderick', 'Jeremy Irons', 'James Earl Jones'],
           },
         ]);
+        await this.movieModel.create(mockMovies);
       } catch (error) {
         console.error('error seeding movies', error);
       }
