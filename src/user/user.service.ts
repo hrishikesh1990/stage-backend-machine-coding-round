@@ -13,44 +13,93 @@ export class UserService {
     @InjectModel(Movie.name) private movieModel: Model<MovieDocument>
   ) {}
 
-  async addToList(userId: string, item: { contentId: string; contentType: string }) {
-    // Validate contentId before proceeding
-    if (!await this.isValidContentId(item.contentId)) {
-      throw new Error('Invalid content ID');
-    }
-    
-    const user = await this.userModel.findById(userId);
-    if (user && !user.myList.some(existingItem => existingItem.contentId === item.contentId)) {
-      return this.userModel.findByIdAndUpdate(
-        userId,
-        { $addToSet: { myList: item } },
+  async addToList(userId: string, contentId: string) {
+    try {
+      const {isValid, contentType} = await this.isValidContentId(contentId);
+      if (!isValid) {
+        throw new Error('Invalid content ID');
+      }
+
+      const updatedUser = await this.userModel.findOneAndUpdate(
+        { _id: userId, 'myList.contentId': { $ne: contentId } },
+        { $addToSet: { myList: {contentId, contentType} } },
         { new: true }
       );
+
+      return updatedUser; // Return the updated user or null if not found
+    } catch (error) {
+      console.error('Error adding to list:', error);
+      throw new Error('Could not add to list'); // Handle error appropriately
     }
-    return user;
   }
 
   async removeFromList(userId: string, contentId: string) {
-    return this.userModel.findByIdAndUpdate(
-      userId,
-      { $pull: { myList: { contentId } } },
-      { new: true }
-    );
+    try {
+      return await this.userModel.findByIdAndUpdate(
+        userId,
+        { $pull: { myList: { contentId } } },
+        { new: true }
+      );
+    } catch (error) {
+      console.error('Error removing from list:', error);
+      throw new Error('Could not remove from list'); // Handle error appropriately
+    }
   }
 
-  async listMyItems(userId: string) {
-    const user = await this.userModel.findById(userId);
-    return user ? user.myList : null;
+  async myListItems(userId: string, limit: number = 10, offset: number = 0) {
+    try {
+      console.log(`Fetching items for userId: ${userId}, limit: ${limit}, offset: ${offset}`);
+      
+      const result = await this.userModel.findOne(
+        { _id: userId },
+        { myList: 1 }
+      ).skip(offset).limit(limit).exec();
+
+      console.log('Find result:', result);
+
+      return result ? result.myList : [];
+    } catch (error) {
+      console.error('Error fetching user items:', error);
+      throw new Error('Could not retrieve user items'); // Handle error appropriately
+    }
   }
 
   async listUser(userId: string) {
-    return this.userModel.findById(userId);
+    try {
+      return await this.userModel.findById(userId);
+    } catch (error) {
+      console.error('Error listing user:', error);
+      throw new Error('Could not retrieve user'); // Handle error appropriately
+    }
   }
 
-  async isValidContentId(contentId: string): Promise<boolean> {
-    const tvExists = await this.tvShowModel.exists({ _id: contentId }) !== null;
-    const movieExists = await this.movieModel.exists({ _id: contentId }) !== null;
-    return tvExists || movieExists;
+  async isValidContentId(contentId: string): Promise<{ isValid: boolean; contentType?: string }> {
+    try {
+      const [tvExists, movieExists] = await Promise.all([
+        this.tvShowModel.exists({ _id: contentId }),
+        this.movieModel.exists({ _id: contentId })
+      ]);
+
+      if (tvExists) {
+        return { isValid: true, contentType: 'TVShow' };
+      } else if (movieExists) {
+        return { isValid: true, contentType: 'Movie' };
+      }
+      
+      return { isValid: false }; // Content ID is invalid
+    } catch (error) {
+      console.error('Error validating content ID:', error);
+      throw new Error('Could not validate content ID'); // Handle error appropriately
+    }
+  }
+
+  async listAllUsers() {
+    try {
+      return await this.userModel.find().exec();
+    } catch (error) {
+      console.error('Error listing all users:', error);
+      throw new Error('Could not retrieve users'); // Handle error appropriately
+    }
   }
 }
 
