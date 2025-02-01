@@ -45,11 +45,14 @@ export class User {
     {
       contentId: { type: String, required: true },
       contentType: { type: String, enum: ['Movie', 'TVShow'], required: true },
+      createdAt: { type: Date },
     },
+
   ])
   myList: {
     contentId: string;
     contentType: string;
+    createdAt?: Date;
   }[];
 }
 
