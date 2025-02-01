@@ -26,10 +26,10 @@ export class UserService {
         { new: true }
       );
 
-      return updatedUser; // Return the updated user or null if not found
+      return updatedUser;
     } catch (error) {
       console.error('Error adding to list:', error);
-      throw new Error('Could not add to list'); // Handle error appropriately
+      throw new Error('Could not add to list');
     }
   }
 
@@ -42,7 +42,7 @@ export class UserService {
       );
     } catch (error) {
       console.error('Error removing from list:', error);
-      throw new Error('Could not remove from list'); // Handle error appropriately
+      throw new Error('Could not remove from list');
     }
   }
 
@@ -60,7 +60,7 @@ export class UserService {
       return result ? result.myList : [];
     } catch (error) {
       console.error('Error fetching user items:', error);
-      throw new Error('Could not retrieve user items'); // Handle error appropriately
+      throw new Error('Could not retrieve user items');
     }
   }
 
@@ -69,7 +69,7 @@ export class UserService {
       return await this.userModel.findById(userId);
     } catch (error) {
       console.error('Error listing user:', error);
-      throw new Error('Could not retrieve user'); // Handle error appropriately
+      throw new Error('Could not retrieve user');
     }
   }
 
@@ -86,10 +86,10 @@ export class UserService {
         return { isValid: true, contentType: 'Movie' };
       }
       
-      return { isValid: false }; // Content ID is invalid
+      return { isValid: false };
     } catch (error) {
       console.error('Error validating content ID:', error);
-      throw new Error('Could not validate content ID'); // Handle error appropriately
+      throw new Error('Could not validate content ID');
     }
   }
 
@@ -98,7 +98,7 @@ export class UserService {
       return await this.userModel.find().exec();
     } catch (error) {
       console.error('Error listing all users:', error);
-      throw new Error('Could not retrieve users'); // Handle error appropriately
+      throw new Error('Could not retrieve users');
     }
   }
 }

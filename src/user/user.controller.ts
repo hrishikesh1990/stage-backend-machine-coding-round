@@ -23,8 +23,8 @@ export class UserController {
     @ApiQuery({ name: 'limit', required: false, type: Number })
     @ApiQuery({ name: 'offset', required: false, type: Number })
     async listMyItems(@Param('userId') userId: string, @Query('limit') limit: number, @Query('offset') offset: number) {
-        const validLimit = isNaN(limit) ? 10 : limit; // Default to 10 if NaN
-        const validOffset = isNaN(offset) ? 0 : offset; // Default to 0 if NaN
+        const validLimit = isNaN(limit) ? 10 : limit;
+        const validOffset = isNaN(offset) ? 0 : offset;
         return this.userService.myListItems(userId, validLimit, validOffset);
     }
 
