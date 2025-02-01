@@ -17,6 +17,7 @@ import { CacheModule } from '@nestjs/cache-manager';
     MongooseModule.forFeature([{ name: TVShow.name, schema: TVShowSchema }]),
     MongooseModule.forFeature([{ name: Movie.name, schema: MovieSchema }]),
     MongooseModule.forFeature([{ name: List.name, schema: ListSchema }]),
+    CacheModule.register(),
   ],
   controllers: [ListController],
   providers: [ListService],
