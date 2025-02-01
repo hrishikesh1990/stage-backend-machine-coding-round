@@ -41,16 +41,7 @@ export class User {
     rating: number;
   }[];
 
-  @Prop([
-    {
-      contentId: { type: String, required: true },
-      contentType: { type: String, enum: ['Movie', 'TVShow'], required: true },
-    },
-  ])
-  myList: {
-    contentId: string;
-    contentType: string;
-  }[];
+
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
