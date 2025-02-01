@@ -5,6 +5,7 @@ import { AppModule } from '../src/app.module';
 import { Connection } from 'mongoose';
 import { getConnectionToken } from '@nestjs/mongoose';
 import { SeedService } from '../src/seed/seed.service';
+import { SeedModule } from '../src/seed/seed.module';
 
 describe('ListController (e2e)', () => {
     let app: INestApplication;
@@ -16,16 +17,19 @@ describe('ListController (e2e)', () => {
 
     beforeAll(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
-            imports: [AppModule],
+            imports: [
+                AppModule,
+                //  SeedModule
+                ],
         }).compile();
 
         app = moduleFixture.createNestApplication();
         await app.init();
 
         dbConnection = moduleFixture.get<Connection>(getConnectionToken());
-        seedService = moduleFixture.get<SeedService>(SeedService);
+        // seedService = moduleFixture.get<SeedService>(SeedService);
 
-        await seedService.seedDatabase();
+        // await seedService.seedDatabase();
 
         // mock auth header username and password are the same
         const testUser = 'user1';
@@ -45,36 +49,81 @@ describe('ListController (e2e)', () => {
                 .expect(401);
         });
 
-        it('should return empty list for new user', () => {
+        it('should return empty paginated list for new user', () => {
             return request(app.getHttpServer())
                 .get('/list')
                 .set('Authorization', authHeader)
                 .expect(200)
                 .expect(res => {
-                    expect(res.body).toEqual([]);
+                    expect(res.body).toEqual({
+                        items: [],
+                        page: 1,
+                        limit: 10,
+                        total: 0,
+                        totalPages: 0
+                    });
                 });
         });
 
-        it('should filter by content type', () => {
-            return request(app.getHttpServer())
-                .get('/list?type=movies')
+        it('should handle pagination', async () => {
+            // First add multiple items to the list
+            await request(app.getHttpServer())
+                .post('/list')
                 .set('Authorization', authHeader)
-                .expect(200)
-                .expect(res => {
-                    expect(res.body).toHaveLength(1);
-                    expect(res.body[0]._id).toBe(movieId);
+                .send({
+                    contentId: movieId,
+                    contentType: 'Movie'
                 });
-        });
 
-        it('should reject invalid content type', () => {
-            return request(app.getHttpServer())
-                .get('/list?type=invalid')
+            await request(app.getHttpServer())
+                .post('/list')
                 .set('Authorization', authHeader)
-                .expect(400);
+                .send({
+                    contentId: tvshowId,
+                    contentType: 'TVShow'
+                });
+
+            // Test first page with limit 1
+            const response = await request(app.getHttpServer())
+                .get('/list?page=1&limit=1')
+                .set('Authorization', authHeader)
+                .expect(200);
+
+            expect(response.body).toMatchObject({
+                items: expect.any(Array),
+                page: 1,
+                limit: 1,
+                total: 2,
+                totalPages: 2
+            });
+            expect(response.body.items).toHaveLength(1);
+
+            // Test second page
+            const secondPage = await request(app.getHttpServer())
+                .get('/list?page=2&limit=1')
+                .set('Authorization', authHeader)
+                .expect(200);
+
+            expect(secondPage.body).toMatchObject({
+                items: expect.any(Array),
+                page: 2,
+                limit: 1,
+                total: 2,
+                totalPages: 2
+            });
+            expect(secondPage.body.items).toHaveLength(1);
+            
+            // Verify different items on different pages
+            expect(secondPage.body.items[0].contentId).not.toBe(response.body.items[0].contentId);
         });
     });
 
     describe('POST /list', () => {
+
+        beforeAll(async () => {
+            await dbConnection.collection('users').updateOne({ username: 'user1' }, { $set: { myList: [] } });
+        });
+
         it('should add movie to list', () => {
             return request(app.getHttpServer())
                 .post('/list')
@@ -90,8 +139,9 @@ describe('ListController (e2e)', () => {
                         .set('Authorization', authHeader)
                         .expect(200)
                         .expect(res => {
-                            expect(res.body).toHaveLength(1);
-                            expect(res.body[0]._id).toBe(movieId);
+                            expect(res.body.items);
+                            // one of the items should have contentId === movieID
+                            expect(res.body.items.some(item => item.contentId === movieId)).toBe(true);
                         });
                 });
         });
@@ -111,9 +161,10 @@ describe('ListController (e2e)', () => {
                         .set('Authorization', authHeader)
                         .expect(200)
                         .expect(res => {
-                            expect(res.body).toHaveLength(1);
-                            expect(res.body[0]._id).toBe(tvshowId);
+                            expect(res.body.items);
+                            expect(res.body.items.some(item => item.contentId === tvshowId)).toBe(true);
                         });
+
                 });
         });
 
@@ -144,11 +195,12 @@ describe('ListController (e2e)', () => {
                         .set('Authorization', authHeader)
                         .expect(200)
                         .expect(res => {
-                            expect(res.body).toHaveLength(0);
+                            expect(res.body.items.some(item => item.contentId === movieId)).toBe(false);
                         });
                 });
         });
     });
+
 
     async function setupTestData(dbConnection: Connection) {
         // Find the seeded movie and tvshow
@@ -163,6 +215,8 @@ describe('ListController (e2e)', () => {
             throw new Error('Seeded tvshow not found');
         }
         tvshowId = tvshow._id.toString();
+
+        await dbConnection.collection('users').updateOne({ username: 'user1' }, { $set: { myList: [] } });
 
         console.log({ movieId, tvshowId });
     }

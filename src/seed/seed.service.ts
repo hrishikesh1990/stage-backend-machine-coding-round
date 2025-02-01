@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import { User } from '../models/user.schema';
 import { TVShow } from '../models/tvshow.schema';
 import { Movie } from '../models/movie.schema';
-import { mockMovies, mockTvShows } from 'src/constants/mockdata';
+import { mockMovies, mockTvShows } from '../constants/mockdata';
 
 @Injectable()
 export class SeedService implements OnModuleInit {

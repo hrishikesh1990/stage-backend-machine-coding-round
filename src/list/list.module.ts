@@ -2,20 +2,28 @@ import { Module, NestModule, MiddlewareConsumer, RequestMethod } from '@nestjs/c
 import { MongooseModule } from '@nestjs/mongoose';
 import { ListService } from './list.service';
 import { ListController } from './list.controller';
-import { List, ListSchema } from '../models/list.schema';
 import { User, UserSchema } from '../models/user.schema';
 import { AuthMiddleware } from '../middleware/auth.middleware';
 import { Movie, MovieSchema } from '../models/movie.schema';
 import { TVShow, TVShowSchema } from '../models/tvshow.schema';
+import { AuthModule } from '../middleware/auth.module';
+
+export interface PaginatedResponse {
+  items: any[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
 
 @Module({
   imports: [
     MongooseModule.forFeature([
-      { name: List.name, schema: ListSchema },
       { name: User.name, schema: UserSchema },
       { name: Movie.name, schema: MovieSchema },
       { name: TVShow.name, schema: TVShowSchema },
     ]),
+    AuthModule,
   ],
   controllers: [ListController],
   providers: [ListService],

@@ -1,9 +1,15 @@
 import { Injectable, NestMiddleware, UnauthorizedException } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
+import { AuthService } from './auth.service';
+
 
 @Injectable()
 export class AuthMiddleware implements NestMiddleware {
-  use(req: Request, res: Response, next: NextFunction) {
+  constructor(private readonly authService: AuthService) {
+    this.authService = authService;
+  }
+
+  async use(req: Request, res: Response, next: NextFunction) {
     const authHeader = req.headers.authorization;
     req.headers['x-user'] = '';
 
@@ -23,6 +29,10 @@ export class AuthMiddleware implements NestMiddleware {
 
     // Add the authenticated user to the request headers
     req.headers['x-user'] = username;
+    const user = await this.authService.listUser(username);
+    if (!user) {
+      throw new UnauthorizedException('[AUTH] User not found');
+    }
 
     next();
   }

@@ -1,27 +1,28 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { List, ListDocument } from '../models/list.schema';
 import { User, UserDocument } from '../models/user.schema';
 import { Movie, MovieDocument } from '../models/movie.schema';
 import { TVShow, TVShowDocument } from '../models/tvshow.schema';
-
+import { PaginatedResponse } from './list.module';
 
 @Injectable()
 export class ListService {
   constructor(
-    @InjectModel(List.name) private listModel: Model<ListDocument>,
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel(Movie.name) private movieModel: Model<MovieDocument>,
     @InjectModel(TVShow.name) private tvshowModel: Model<TVShowDocument>,
   ) { }
 
   async addToList(userId: string, contentId: string, contentType: string) {
-    const user = await this.userModel.findOne({ username: userId });
-
-    if (!user) {
-      throw new NotFoundException(`User ${userId} not found`);
-    }
+    const user = await this.userModel.findOne(
+      { username: userId },
+      {
+        myList: {
+          $elemMatch: { contentId }
+        }
+      }
+    );
 
     if (user.myList.some(item => item.contentId === contentId)) {
       throw new BadRequestException(`Content ${contentId} already in list`);
@@ -41,53 +42,47 @@ export class ListService {
       throw new BadRequestException(`Invalid content type: ${contentType}`);
     }
 
-    user.myList.push({ contentId, contentType, createdAt: new Date() });
-    await user.save();
+    await this.userModel.updateOne({ username: userId }, { $push: { myList: { contentId, contentType, createdAt: new Date() } } });
+
+    // user.myList.push({ contentId, contentType, createdAt: new Date() });
+    // await user.save();
   }
 
   async removeFromList(userId: string, contentId: string) {
-    const user = await this.userModel.findOne({ username: userId });
-    if (!user) {
-      throw new NotFoundException(`User ${userId} not found`);
+    const result = await this.userModel.updateOne({ username: userId }, { $pull: { myList: { contentId } } });
+    if (result.modifiedCount === 0) {
+      throw new NotFoundException(`Content ${contentId} not found in list`);
     }
-
-    user.myList = user.myList.filter(item => item.contentId !== contentId);
-    await user.save();
   }
 
-  async listMyItems(userId: string, contentType?: string) {
-    const user = await this.userModel.findOne({ username: userId });
-    if (!user) {
-      throw new NotFoundException(`User ${userId} not found`);
-    }
-    const myList = user.myList;
-
-    // populate the list with the content
-    const items = await Promise.all(myList.map(async (item) => {
-      if (item.contentType === 'Movie') {
-        const movie = await this.movieModel.findById(item.contentId);
-        return { ...item, ...movie.toObject({ getters: true, versionKey: false })};
-      } else if (item.contentType === 'TVShow') {
-        const tvshow = await this.tvshowModel.findById(item.contentId);
-        return { ...item, ...tvshow.toObject({ getters: true, versionKey: false }) };
+  async listMyItems(
+    userId: string,
+    page: number = 1,
+    limit: number = 10
+  ): Promise<PaginatedResponse> {
+    const skip = (page - 1) * limit;
+    const user = (await this.userModel.findOne(
+      { username: userId },
+      {
+        myList: {
+          $slice: [skip, limit],
+        },
+        total: {
+          $size: "$myList"
+        }
       }
-    }));
+    )).toJSON();
 
-    return items;
-    // let items = [];
+    //@ts-ignore
+    const total = user.total || 0;
 
-    // if (!contentType || contentType === 'movies') {
-
-    // }
-
-    // if (!contentType || contentType === 'tvshows') {
-    //   const tvshows = await this.tvshowModel.find(
-    //     { _id: { $in: myList.map(item => item.contentId) } },
-    //     // { contentType: 'TVShow' }
-    //   );
-    //   items.push(...tvshows);
-    // }
-    // return items;
+    return {
+      items: user.myList || [],
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit)
+    };
   }
 
   async listUser(userId: string) {

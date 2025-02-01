@@ -1,7 +1,8 @@
-import { Controller, Get, Param, UseGuards, Req, Post, Delete, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards, Req, Post, Delete, BadRequestException, Query } from '@nestjs/common';
 import { ListService } from './list.service';
 import { ApiTags, ApiHeader } from '@nestjs/swagger';
 import { Request } from 'express';
+import { PaginatedResponse } from './list.module';
 
 @ApiTags('List')
 @Controller('list')
@@ -14,15 +15,25 @@ export class ListController {
         description: 'Basic auth credentials',
         required: true,
     })
-    async getMyList(@Req() request: Request) {
+    async getMyList(
+        @Req() request: Request,
+        @Query('page') page?: number,
+        @Query('limit') limit?: number,
+    ): Promise<PaginatedResponse> {
         const user = request.headers['x-user'] as string;
-        const contentType = request.query.type as string;
+        
+        const pageNumber = page ? parseInt(page as any) : 1;
+        const limitNumber = limit ? parseInt(limit as any) : 10;
 
-        if (contentType && !['movies', 'tvshows'].includes(contentType)) {
-            throw new BadRequestException('Invalid content type. Must be "movies" or "tvshows"');
+        if (pageNumber < 1) {
+            throw new BadRequestException('Page must be greater than 0');
         }
 
-        return this.listService.listMyItems(user, contentType);
+        if (limitNumber < 1 || limitNumber > 100) {
+            throw new BadRequestException('Limit must be between 1 and 100');
+        }
+
+        return this.listService.listMyItems(user, pageNumber, limitNumber);
     }
 
     @Post()
