@@ -1,11 +1,14 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-export type UserDocument = User & Document;
 import { genre } from '../constants/constants';
+
+export type UserDocument = User & Document;
 
 @Schema()
 export class User {
-  @Prop({ required: true })
+
+  // Index for user lookups
+  @Prop({ required: true, unique: true, index: true })
   username: string;
 
   @Prop({
@@ -28,6 +31,7 @@ export class User {
   })
   dislikedGenres: string[];
 
+  // Index for querying watch history
   @Prop([
     {
       contentId: { type: String, required: true },
@@ -41,6 +45,7 @@ export class User {
     rating: number;
   }[];
 
+  // Index for myList queries
   @Prop([
     {
       contentId: { type: String, required: true },
@@ -54,3 +59,7 @@ export class User {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+
+// Create compound indexes for watch history and myList
+UserSchema.index({ 'watchHistory.contentId': 1, 'watchHistory.watchedOn': -1 });
+UserSchema.index({ 'myList.contentId': 1, 'myList.contentType': 1 });

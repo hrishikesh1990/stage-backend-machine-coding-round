@@ -6,6 +6,8 @@ import {
   ArrayMinSize,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+
 export class CreateMovieDto {
   @ApiProperty()
   @IsNotEmpty()
@@ -26,6 +28,7 @@ export class CreateMovieDto {
   @ApiProperty({ type: Date })
   @IsNotEmpty()
   @IsDate()
+  @Type(() => Date) // Transform the string into a Date object
   releaseDate: Date;
 
   @ApiProperty()
