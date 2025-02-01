@@ -12,7 +12,7 @@ export class UserService {
     throw new Error('Method not implemented.');
   }
 
-  async listMyItems(){
+  async listMyItems() {
     throw new Error('Method not implemented.');
   }
 

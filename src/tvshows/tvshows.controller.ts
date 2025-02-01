@@ -21,7 +21,7 @@ export class TVShowsController {
   }
 
   @Post()
-  @UsePipes(new ValidationPipe({ transform: true })) // Apply validation using ValidationPipe
+  @UsePipes(new ValidationPipe({ transform: false })) // Apply validation using ValidationPipe
   async create(@Body() createTVShowDto: CreateTVshowDto) {
     return this.tvShowsService.create(createTVShowDto);
   }
