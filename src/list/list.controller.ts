@@ -45,10 +45,12 @@ export class ListController {
   async listMyItems(
     @Param('userId') userId: string,
     @Query('limit') limit: number = 10,
-    @Query('offset') offset: number = 0
+    @Query('offset') offset: number = 0,
+    @Query('contentType') contentType?: string
+
   ) {
     try {
-      const items = await this.listService.listMyItems(userId, limit, offset);
+      const items = await this.listService.listMyItems(userId, limit, offset,contentType);
       return {
         statusCode: HttpStatus.OK,
         message: 'Items retrieved successfully',
@@ -64,7 +66,10 @@ export class ListController {
       );
     }
   }
-
+  @Post('bulk/:userId')
+  async bulkAddToList(@Param('userId') userId: string, @Body() items: { contentId: string; contentType: string }[]) {
+    return this.listService.bulkAddToList(userId, items);
+  }
   @Delete(':userId/:contentId')
   async removeFromList(@Param('userId') userId: string, @Param('contentId') contentId: string) {
     try {
