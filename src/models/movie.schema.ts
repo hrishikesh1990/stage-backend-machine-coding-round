@@ -22,8 +22,6 @@ export class Movie {
   })
   genres: string[];
 
-  @Prop({ required: true })
-  releaseDate: Date;
 
   @Prop({ required: true })
   director: string;
