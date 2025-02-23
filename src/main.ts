@@ -14,7 +14,7 @@ async function bootstrap() {
     credentials: true,
   });
   const config = new DocumentBuilder()
-    .setTitle('Stage Api docs')
+    .setTitle('Documentation for User, Movies and TV Shows')
     .setDescription(
       'Have all the routes documentation for user, movies and tvshows',
     )
