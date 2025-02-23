@@ -7,7 +7,12 @@ services:
       - '27017:27017'
     volumes:
       - mongo-data:/data/db
-
+redis:
+    image: redis:latest
+    container_name: redis_cache
+    restart: always
+    ports:
+      - '6379:6379'
   app:
     build:
       context: .
@@ -22,3 +27,4 @@ services:
 
 volumes:
   mongo-data:
+  
