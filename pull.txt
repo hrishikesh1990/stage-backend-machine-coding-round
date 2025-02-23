@@ -1,0 +1,32 @@
+This PR enhances the platform with performance optimizations, security measures, and structured documentation.
+
+### Key Features & Enhancements
+
+#### API Endpoints for User , List Management .Additional endpoints for movies and TV Shows (http://localhost:3000/api)
+
+#### Rate Limiting & Throttling
+
+- Implemented ThrottlerGuard to prevent API overuse.
+- Limited requests per minute per user(configurable).
+
+#### Caching for Performance
+
+- Integrated redis cache-manager to reduce database load.
+- Frequently accessed data is stored in-memory (TTL).
+
+#### Indexed Queries for Faster DB Operations
+
+- Indexes added on models to improve query performance.
+
+#### API Documentation & Swagger
+
+- Added Swagger UI (`/api`) for easy API testing.
+- Included a detailed README covering endpoints, security, and setup.
+
+### **🔧 How to Test**
+
+- Run the application:
+  ```bash
+  npm run start
+  ```
+- Access Swagger API Docs at: **`http://localhost:3000/api`**

@@ -25,7 +25,7 @@ export class CreateMovieDto {
 
   @ApiProperty({ type: Date })
   @IsNotEmpty()
-  @IsDate()
+  
   releaseDate: Date;
 
   @ApiProperty()
