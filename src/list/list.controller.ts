@@ -13,11 +13,16 @@ import {
 import { ListService } from './list.service';
 import { CreateListItemDto } from './dto/create-list-item.dto';
 import { ThrottlerGuard } from '@nestjs/throttler';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+@ApiTags('List')
 @Controller('list')
 @UseGuards(ThrottlerGuard) 
 export class ListController {
   constructor(private readonly listService: ListService) {}
   @Post(':userId')
+  @ApiOperation({ summary: 'Add an item to the list' })
+  @ApiResponse({ status: 201, description: 'Item added successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid input' })
   async addToList(
     @Param('userId') userId: string,
     @Body() createListItemDto: CreateListItemDto
@@ -41,6 +46,9 @@ export class ListController {
   }
 
   @Get(':userId')
+  @ApiOperation({ summary: 'Get user\'s list with pagination' })
+  @ApiResponse({ status: 200, description: 'Items retrieved successfully' })
+ 
   async listMyItems(
     @Param('userId') userId: string,
     @Query('limit') limit: number = 10,
@@ -73,7 +81,7 @@ export class ListController {
     try {
       const updatedList = await this.listService.bulkAddToList(
         userId,
-        items.map(item => ({ ...item, userId })) // ✅ Ensure `userId` is added
+        items.map(item => ({ ...item, userId }))
       );
       return {
         statusCode: HttpStatus.CREATED,
@@ -91,6 +99,9 @@ export class ListController {
     }
   }
   @Delete(':userId/:contentId')
+  @ApiOperation({ summary: 'Remove an item from the list' })
+  @ApiResponse({ status: 200, description: 'Item removed successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid input' })
   async removeFromList(@Param('userId') userId: string, @Param('contentId') contentId: string) {
     try {
       const result = await this.listService.removeFromList(userId, contentId);
